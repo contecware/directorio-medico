@@ -57,7 +57,7 @@ export default function Login(){
         <button onClick={()=>navigate('/')} style={{background:'none',border:'none',color:'#9ca3af',fontSize:13,marginTop:16,display:'block',width:'100%'}}>
           ← Volver al directorio público
         </button>
-        <div style={{fontSize:11,color:'#d1d5db',marginTop:8}}>Credenciales configuradas en <code>.env</code></div>
+        <div style={{fontSize:11,color:'#d1d5db',marginTop:8}}>Desarrollado por: <code>ContecWare</code></div>
       </div>
     </div>
   )
