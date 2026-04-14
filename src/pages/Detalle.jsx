@@ -1,163 +1,167 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../supabase'
-import styles from './Detalle.module.css'
 
 const DIAS = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
 
-function getInitials(name = '') {
-  return name.split(' ').filter(w => /^[A-ZÁÉÍÓÚ]/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('')
+function initials(name='') {
+  return name.split(' ').filter(w=>/^[A-ZÁÉÍÓÚ]/i.test(w)).slice(0,2).map(w=>w[0].toUpperCase()).join('')
+}
+function waLink(num,doctor){
+  const n=(num||'').replace(/\D/g,'')
+  const m=encodeURIComponent(`Hola, me comunico del Directorio Médico con ${doctor}. Quisiera información sobre sus servicios.`)
+  return `https://wa.me/${n}?text=${m}`
 }
 
-export default function Detalle() {
-  const { id }     = useParams()
-  const navigate   = useNavigate()
-  const [clinica, setClinicia] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(null)
-
-  useEffect(() => {
-    async function cargar() {
-      const { data, error } = await supabase
-        .from('clinicas')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-      if (error) { setError('No se encontró el consultorio.'); setLoading(false); return }
-      setClinicia(data)
-      setLoading(false)
-    }
-    cargar()
-  }, [id])
-
-  if (loading) return (
-    <div className={styles.page}>
-      <nav className={styles.nav}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>← Volver</button>
-      </nav>
-      <div className={styles.loadingWrap}>
-        <div className={`skeleton ${styles.skHero}`} />
-        {[...Array(3)].map((_, i) => <div key={i} className={`skeleton ${styles.skCard}`} />)}
+function InfoRow({icon,label,value}){
+  if(!value) return null
+  return (
+    <div style={{display:'flex',alignItems:'center',gap:12,padding:'9px 0',borderBottom:'1px solid #f3f4f6'}}>
+      <div style={{width:34,height:34,background:'#f3f4f6',borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',fontSize:15,flexShrink:0}}>{icon}</div>
+      <div>
+        <div style={{fontSize:10,color:'#9ca3af',fontWeight:700,textTransform:'uppercase',letterSpacing:'0.5px'}}>{label}</div>
+        <div style={{fontSize:14,color:'#374151',fontWeight:600}}>{value}</div>
       </div>
     </div>
   )
+}
 
-  if (error) return (
-    <div className={styles.page}>
-      <nav className={styles.nav}><button className={styles.backBtn} onClick={() => navigate('/')}>← Volver</button></nav>
-      <div className={styles.errorWrap}><div className={styles.errorIcon}>⚠️</div><p>{error}</p></div>
+export default function Detalle(){
+  const {id}    = useParams()
+  const navigate= useNavigate()
+  const [c,setC]= useState(null)
+  const [loading,setLoading]=useState(true)
+  const [err,setErr]=useState(null)
+
+  useEffect(()=>{
+    supabase.from('clinicas').select('*').eq('id',id).single()
+      .then(({data,error})=>{
+        if(error){setErr('No se encontró el consultorio.');setLoading(false);return}
+        setC(data);setLoading(false)
+      })
+  },[id])
+
+  if(loading) return (
+    <div style={{minHeight:'100vh',background:'#f3f4f6'}}>
+      <nav style={S.nav}><button style={S.backBtn} onClick={()=>navigate(-1)}>← Volver</button></nav>
+      <div style={{padding:20,display:'flex',flexDirection:'column',gap:12}}>
+        <div className="sk" style={{height:200,borderRadius:0}} />
+        {[...Array(3)].map((_,i)=><div key={i} className="sk" style={{height:120,borderRadius:16}}/>)}
+      </div>
+    </div>
+  )
+  if(err) return (
+    <div style={{minHeight:'100vh',background:'#f3f4f6'}}>
+      <nav style={S.nav}><button style={S.backBtn} onClick={()=>navigate('/')}>← Volver</button></nav>
+      <div style={{textAlign:'center',padding:80}}><div style={{fontSize:48}}>⚠️</div><p style={{marginTop:12}}>{err}</p></div>
     </div>
   )
 
-  const servicios = clinica.servicios
-    ? clinica.servicios.split(',').map(s => s.trim()).filter(Boolean)
-    : []
+  const servicios = (c.servicios||'').split(',').map(s=>s.trim()).filter(Boolean)
+  const todayIdx  = new Date().getDay()-1  // 0=lun
 
   return (
-    <div className={styles.page}>
+    <div style={{minHeight:'100vh',background:'#f3f4f6',paddingBottom:40}}>
+
       {/* NAV */}
-      <nav className={styles.nav}>
-        <button className={styles.backBtn} onClick={() => navigate('/')}>← Directorio</button>
-        <span className={clinica.activo ? styles.openBadge : styles.closedBadge}>
-          {clinica.activo ? '● ABIERTO' : '● CERRADO'}
+      <nav style={S.nav}>
+        <button style={S.backBtn} onClick={()=>navigate('/')}>← Directorio</button>
+        <span style={{...S.badge,...(c.activo?S.badgeOpen:S.badgeClosed)}}>
+          {c.activo?'● ABIERTO':'● CERRADO'}
         </span>
       </nav>
 
       {/* HEADER */}
-      <header className={styles.header}>
-        <div className={styles.avatar}>{getInitials(clinica.nombre_doctor)}</div>
-        <h1 className={styles.name}>{clinica.nombre_doctor}</h1>
-        <div className={styles.specialty}>🩺 {clinica.especialidad}</div>
-        <div className={styles.clinicSub}>{clinica.nombre_clinica}</div>
+      <header style={S.header}>
+        <div style={{position:'relative',display:'inline-block',marginBottom:16}}>
+          {c.foto_url
+            ? <img src={c.foto_url} alt={c.nombre_doctor} style={{width:90,height:90,borderRadius:'50%',objectFit:'cover',border:'4px solid rgba(255,255,255,0.3)'}}/>
+            : <div style={{width:90,height:90,borderRadius:'50%',background:'linear-gradient(135deg,#10b981,#059669)',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'var(--font-disp)',fontSize:32,fontWeight:700,color:'#fff',boxShadow:'0 6px 24px rgba(16,185,129,0.4)'}}>
+                {initials(c.nombre_doctor)}
+              </div>
+          }
+        </div>
+        <h1 style={{fontFamily:'var(--font-disp)',fontSize:'clamp(20px,5vw,26px)',color:'#fff',marginBottom:8}}>{c.nombre_doctor}</h1>
+        <div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(255,255,255,0.15)',border:'1px solid rgba(255,255,255,0.25)',color:'#fff',padding:'5px 14px',borderRadius:20,fontSize:13,fontWeight:600,marginBottom:6}}>
+          🩺 {c.especialidad}
+        </div>
+        {c.nombre_clinica && <div style={{fontSize:13,color:'rgba(255,255,255,0.6)',marginTop:4}}>{c.nombre_clinica}</div>}
       </header>
 
-      {/* CARDS */}
-      <div className={styles.cards}>
+      {/* CONTENT */}
+      <div style={{padding:'20px 16px',display:'flex',flexDirection:'column',gap:12,maxWidth:640,margin:'0 auto'}}>
 
         {/* Ubicación */}
-        <section className={styles.infoCard}>
-          <h2 className={styles.cardTitle}>🏥 Consultorio</h2>
-          <div className={styles.infoRows}>
-            <InfoRow icon="🏢" label="Piso / Nivel"        value={clinica.piso_nivel} />
-            <InfoRow icon="🚪" label="Número de Consultorio" value={clinica.numero_consultorio} />
-            <InfoRow icon="🏷️" label="Nombre de la Clínica" value={clinica.nombre_clinica} />
-          </div>
-        </section>
+        <div style={S.card}>
+          <div style={S.cardTitle}>🏥 Consultorio</div>
+          <InfoRow icon="🏢" label="Piso / Nivel"          value={c.piso_nivel} />
+          <InfoRow icon="🚪" label="Número de Consultorio" value={c.numero_consultorio} />
+          <InfoRow icon="🏷️" label="Nombre de la Clínica"  value={c.nombre_clinica} />
+        </div>
 
         {/* Contacto */}
-        <section className={styles.infoCard}>
-          <h2 className={styles.cardTitle}>📞 Contacto</h2>
-          <div className={styles.infoRows}>
-            <InfoRow icon="📞" label="Teléfono"  value={clinica.telefono} />
-            <InfoRow icon="🔢" label="Extensión" value={clinica.extension} />
-            {clinica.email && <InfoRow icon="✉️" label="Email" value={clinica.email} />}
-          </div>
-        </section>
+        <div style={S.card}>
+          <div style={S.cardTitle}>📞 Contacto</div>
+          <InfoRow icon="📞" label="Teléfono"  value={c.telefono} />
+          <InfoRow icon="🔢" label="Extensión" value={c.extension} />
+          <InfoRow icon="💬" label="WhatsApp"  value={c.whatsapp} />
+          <InfoRow icon="✉️" label="Email"      value={c.email} />
+        </div>
 
         {/* Horarios */}
-        <section className={styles.infoCard}>
-          <h2 className={styles.cardTitle}>⏰ Horarios</h2>
-          <p className={styles.horariosText}>{clinica.horario_texto}</p>
-          <div className={styles.scheduleGrid}>
-            {DIAS.map((d, i) => (
-              <div key={d} className={`${styles.schedDay} ${i === new Date().getDay() - 1 ? styles.schedToday : ''}`}>
-                <div className={styles.schedDayName}>{d}</div>
-                <div className={styles.schedHours}>{clinica.horario_texto?.includes('Sáb') || i < 5 ? '8:00–14:00' : 'Cerrado'}</div>
+        <div style={S.card}>
+          <div style={S.cardTitle}>⏰ Horarios de Atención</div>
+          <div style={{background:'#eff6ff',borderLeft:'3px solid #2563eb',padding:'10px 14px',borderRadius:8,fontSize:14,color:'#1e40af',fontWeight:600,marginBottom:14}}>
+            {c.horario_texto || 'Consultar horario directamente'}
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:5}}>
+            {DIAS.map((d,i)=>(
+              <div key={d} style={{background:i===todayIdx?'#dbeafe':'#f3f4f6',border:i===todayIdx?'1.5px solid #2563eb':'1.5px solid transparent',borderRadius:8,padding:'7px 3px',textAlign:'center'}}>
+                <div style={{fontSize:9,fontWeight:700,color:i===todayIdx?'#1d4ed8':'#9ca3af',textTransform:'uppercase'}}>{d}</div>
+                <div style={{fontSize:9,color:'#374151',marginTop:2,fontWeight:500}}>8–14h</div>
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
         {/* Servicios */}
-        {servicios.length > 0 && (
-          <section className={styles.infoCard}>
-            <h2 className={styles.cardTitle}>✅ Servicios ofrecidos</h2>
-            <ul className={styles.serviceList}>
-              {servicios.map((s, i) => (
-                <li key={i} className={styles.serviceItem}>
-                  <span className={styles.serviceDot}>●</span>{s}
-                </li>
-              ))}
-            </ul>
-          </section>
+        {servicios.length>0 && (
+          <div style={S.card}>
+            <div style={S.cardTitle}>✅ Servicios ofrecidos</div>
+            {servicios.map((sv,i)=>(
+              <div key={i} style={{padding:'7px 0',borderBottom:i<servicios.length-1?'1px solid #f3f4f6':'none',fontSize:13,color:'#374151',display:'flex',gap:8}}>
+                <span style={{color:'#10b981',fontWeight:700,flexShrink:0}}>●</span>{sv}
+              </div>
+            ))}
+          </div>
         )}
 
-        {/* CTA */}
-        <div style={{ display:'grid', gridTemplateColumns: clinica.whatsapp ? '1fr 1fr' : '1fr', gap: 10 }}>
-          <a href={`tel:${clinica.telefono}`} className={styles.callBtn}>
-            📞 Llamar al consultorio
-          </a>
-          {clinica.whatsapp && (
-            <a
-              href={`https://wa.me/${clinica.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(`Hola, me comunico con ${clinica.nombre_doctor}. Quisiera información sobre sus servicios.`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.waBtn}
-            >
+        {/* ── CTA BUTTONS ── */}
+        <div style={{display:'grid',gridTemplateColumns:c.whatsapp?'1fr 1fr':'1fr',gap:10}}>
+          <a href={`tel:${c.telefono}`} style={S.btnCall}>📞 Llamar al consultorio</a>
+          {c.whatsapp && (
+            <a href={waLink(c.whatsapp,c.nombre_doctor)} target="_blank" rel="noopener noreferrer" style={S.btnWa}>
               💬 WhatsApp
             </a>
           )}
         </div>
 
-        <button className={styles.backBtnBottom} onClick={() => navigate('/')}>
-          ← Volver al directorio
-        </button>
+        <button onClick={()=>navigate('/')} style={S.btnBack}>← Volver al directorio</button>
       </div>
     </div>
   )
 }
 
-function InfoRow({ icon, label, value }) {
-  return (
-    <div style={{ display:'flex', alignItems:'center', gap:12, padding:'9px 0', borderBottom:'1px solid var(--g100)' }}>
-      <div style={{ width:34, height:34, background:'var(--g100)', borderRadius:9, display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, flexShrink:0 }}>
-        {icon}
-      </div>
-      <div>
-        <div style={{ fontSize:10, color:'var(--g500)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{label}</div>
-        <div style={{ fontSize:14, color:'var(--g700)', fontWeight:600 }}>{value || '—'}</div>
-      </div>
-    </div>
-  )
+const S = {
+  nav:{ background:'linear-gradient(135deg,#2563eb,#1d4ed8)', height:56, padding:'0 20px', display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:50 },
+  backBtn:{ background:'none', border:'none', color:'rgba(255,255,255,0.8)', fontSize:14, fontWeight:500 },
+  badge:{ fontSize:11,fontWeight:700,padding:'4px 10px',borderRadius:20 },
+  badgeOpen:{ background:'#d1fae5',color:'#065f46' },
+  badgeClosed:{ background:'#fee2e2',color:'#991b1b' },
+  header:{ background:'linear-gradient(155deg,#1e40af,#2563eb 60%,#3b82f6)', padding:'28px 24px 36px', textAlign:'center' },
+  card:{ background:'#fff', borderRadius:16, padding:'16px 18px', boxShadow:'0 2px 8px rgba(0,0,0,0.07)' },
+  cardTitle:{ fontSize:11, textTransform:'uppercase', letterSpacing:1, color:'#9ca3af', fontWeight:700, marginBottom:10 },
+  btnCall:{ display:'flex',alignItems:'center',justifyContent:'center',gap:8,background:'#2563eb',color:'#fff',padding:16,borderRadius:12,fontSize:15,fontWeight:700,boxShadow:'0 4px 18px rgba(37,99,235,0.32)',textDecoration:'none' },
+  btnWa:{ display:'flex',alignItems:'center',justifyContent:'center',gap:8,background:'#10b981',color:'#fff',padding:16,borderRadius:12,fontSize:15,fontWeight:700,boxShadow:'0 4px 18px rgba(16,185,129,0.32)',textDecoration:'none' },
+  btnBack:{ background:'none',border:'1.5px solid #e5e7eb',color:'#6b7280',padding:'12px',borderRadius:10,fontSize:14,fontWeight:600,width:'100%' },
 }

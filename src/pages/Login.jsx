@@ -1,80 +1,63 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import styles from './Login.module.css'
 
-export default function Login() {
-  const navigate  = useNavigate()
-  const [user,    setUser]    = useState('')
-  const [pass,    setPass]    = useState('')
-  const [error,   setError]   = useState('')
-  const [loading, setLoading] = useState(false)
+export default function Login(){
+  const navigate = useNavigate()
+  const [user,setUser] = useState('')
+  const [pass,setPass] = useState('')
+  const [err,setErr]   = useState('')
+  const [busy,setBusy] = useState(false)
 
   const ADMIN_USER = import.meta.env.VITE_ADMIN_USER || 'admin'
   const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || 'admin123'
 
-  function handleLogin(e) {
+  function handleLogin(e){
     e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    setTimeout(() => {
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        sessionStorage.setItem('dm_admin', 'true')
+    setBusy(true); setErr('')
+    setTimeout(()=>{
+      if(user===ADMIN_USER && pass===ADMIN_PASS){
+        sessionStorage.setItem('dm_admin','true')
         navigate('/admin')
       } else {
-        setError('Usuario o contraseña incorrectos.')
-        setLoading(false)
+        setErr('Usuario o contraseña incorrectos.')
+        setBusy(false)
       }
-    }, 600)
+    },600)
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.iconWrap}>🔐</div>
-        <h1 className={styles.title}>Acceso Administrativo</h1>
-        <p className={styles.subtitle}>Ingresa tus credenciales para gestionar el directorio</p>
+    <div style={{minHeight:'100vh',background:'linear-gradient(155deg,#1e40af,#2563eb 55%,#3b82f6)',display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>
+      <div style={{background:'#fff',borderRadius:20,padding:'40px 36px',width:'100%',maxWidth:400,boxShadow:'0 10px 40px rgba(0,0,0,0.2)',textAlign:'center'}}>
 
-        <form onSubmit={handleLogin} className={styles.form}>
-          <div className={styles.field}>
-            <label className={styles.label}>Usuario</label>
-            <input
-              className={styles.input}
-              type="text"
-              placeholder="admin"
-              value={user}
-              onChange={e => setUser(e.target.value)}
-              autoComplete="username"
-              required
-            />
+        <div style={{width:68,height:68,background:'linear-gradient(135deg,#1e40af,#2563eb)',borderRadius:20,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,margin:'0 auto 20px',boxShadow:'0 4px 20px rgba(37,99,235,0.3)'}}>🔐</div>
+
+        <h1 style={{fontFamily:'var(--font-disp)',fontSize:24,color:'#111827',marginBottom:8}}>Acceso Administrativo</h1>
+        <p style={{fontSize:14,color:'#6b7280',marginBottom:28}}>Ingresa tus credenciales para gestionar el directorio</p>
+
+        <form onSubmit={handleLogin} style={{display:'flex',flexDirection:'column',gap:14}}>
+          <div style={{display:'flex',flexDirection:'column',gap:5,textAlign:'left'}}>
+            <label style={{fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'0.5px'}}>Usuario</label>
+            <input value={user} onChange={e=>setUser(e.target.value)} placeholder="admin" required
+              style={{border:'1.5px solid #e5e7eb',borderRadius:10,padding:'12px 14px',fontSize:15,outline:'none'}} />
           </div>
-          <div className={styles.field}>
-            <label className={styles.label}>Contraseña</label>
-            <input
-              className={styles.input}
-              type="password"
-              placeholder="••••••••"
-              value={pass}
-              onChange={e => setPass(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
+          <div style={{display:'flex',flexDirection:'column',gap:5,textAlign:'left'}}>
+            <label style={{fontSize:11,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'0.5px'}}>Contraseña</label>
+            <input type="password" value={pass} onChange={e=>setPass(e.target.value)} placeholder="••••••••" required
+              style={{border:'1.5px solid #e5e7eb',borderRadius:10,padding:'12px 14px',fontSize:15,outline:'none'}} />
           </div>
 
-          {error && <div className={styles.error}>⚠️ {error}</div>}
+          {err && <div style={{background:'#fef2f2',border:'1px solid #fecaca',color:'#991b1b',padding:'10px 14px',borderRadius:8,fontSize:13,fontWeight:500}}>⚠️ {err}</div>}
 
-          <button className={styles.loginBtn} type="submit" disabled={loading}>
-            {loading ? 'Verificando...' : 'Ingresar al Panel →'}
+          <button type="submit" disabled={busy}
+            style={{background:'linear-gradient(135deg,#1e40af,#2563eb)',color:'#fff',border:'none',padding:14,borderRadius:10,fontSize:15,fontWeight:700,marginTop:4,opacity:busy?0.7:1}}>
+            {busy?'Verificando...':'Ingresar al Panel →'}
           </button>
         </form>
 
-        <button className={styles.backLink} onClick={() => navigate('/')}>
+        <button onClick={()=>navigate('/')} style={{background:'none',border:'none',color:'#9ca3af',fontSize:13,marginTop:16,display:'block',width:'100%'}}>
           ← Volver al directorio público
         </button>
-
-        <div className={styles.hint}>
-          Credenciales configuradas en el archivo <code>.env</code>
-        </div>
+        <div style={{fontSize:11,color:'#d1d5db',marginTop:8}}>Credenciales configuradas en <code>.env</code></div>
       </div>
     </div>
   )
