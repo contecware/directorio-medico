@@ -52,7 +52,14 @@
   background: var(--g100); padding: 8px 14px; border-radius: 9px;
   flex: 1; max-width: 380px;
 }
-.searchBox input { border: none; background: none; outline: none; font-size: 14px; flex: 1; }
+.searchBox input { 
+  border: none; 
+  background: #ffffff; 
+  color: #1a202c;
+  outline: none; 
+  font-size: 14px; 
+  flex: 1; 
+}
 .searchBox button { background: none; border: none; color: var(--g500); font-size: 13px; }
 .totalLabel { font-size: 13px; color: var(--g500); white-space: nowrap; }
 .addBtn {
@@ -166,7 +173,8 @@
   border: 1.5px solid var(--g300); border-radius: 8px;
   padding: 10px 12px; font-size: 14px; outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
-  color: var(--g700);
+  background: #ffffff;
+  color: #1a202c;
 }
 .fieldInput:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(0,168,150,0.1); }
 
