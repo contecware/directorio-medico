@@ -691,14 +691,30 @@
 /* FORM */
 .formGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .formGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 .formField {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .fullWidth {
@@ -716,7 +732,7 @@
 .fieldInput,
 .fieldSelect {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border: 2px solid #e5e7eb;
   border-radius: 10px;
   font-size: 15px;
@@ -724,6 +740,8 @@
   background: #ffffff;
   color: #111827;
   transition: all 0.2s;
+  box-sizing: border-box;
+  height: 48px;
 }
 
 .fieldInput:focus,
@@ -944,4 +962,29 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* FIX: Botón Agregar Médico */
+.addBtn {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.searchContainer {
+  position: relative;
+  z-index: 1;
+}
+
+/* FIX: Responsive del modal en pantallas pequeñas */
+@media (max-width: 768px) {
+  .modal {
+    max-width: 100%;
+    margin: 10px;
+    border-radius: 16px;
+  }
+  
+  .modalBody {
+    padding: 20px;
+  }
 }
