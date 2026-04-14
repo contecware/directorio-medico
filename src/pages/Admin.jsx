@@ -28,7 +28,6 @@ export default function Admin(){
   const [saving,  setSaving]  = useState(false)
   const [delId,   setDelId]   = useState(null)
   const [toast,   setToast]   = useState(null)
-  const [selected, setSelected] = useState(null)
 
   const toast$ = (msg,type='ok') => { setToast({msg,type}); setTimeout(()=>setToast(null),3000) }
 
@@ -43,7 +42,7 @@ export default function Admin(){
 
   function logout(){ sessionStorage.removeItem('dm_admin'); navigate('/login') }
 
-  function openAdd(){ setForm(EMPTY); setEditId(null); setModal('add'); setSelected(null) }
+  function openAdd(){ setForm(EMPTY); setEditId(null); setModal('add') }
   function openEdit(r){
     setForm({
       nombre_doctor:r.nombre_doctor||'', especialidad:r.especialidad||'',
@@ -53,9 +52,9 @@ export default function Admin(){
       email:r.email||'', horario_texto:r.horario_texto||'',
       servicios:r.servicios||'', foto_url:r.foto_url||'', activo:r.activo??true
     })
-    setEditId(r.id); setModal('edit'); setSelected(r)
+    setEditId(r.id); setModal('edit')
   }
-  function closeModal(){ setModal(false); setEditId(null); setSelected(null) }
+  function closeModal(){ setModal(false); setEditId(null) }
   function hc(e){ const{name,value,type,checked}=e.target; setForm(f=>({...f,[name]:type==='checkbox'?checked:value})) }
 
   async function save(e){
@@ -85,193 +84,415 @@ export default function Admin(){
   const filtered = rows.filter(r=>!q||[r.nombre_doctor,r.especialidad,r.nombre_clinica,r.numero_consultorio].some(v=>v?.toLowerCase().includes(q.toLowerCase())))
 
   return (
-    <div style={{display:'flex',minHeight:'100vh',background:'#f1f5f9',fontFamily:'system-ui, -apple-system, sans-serif'}}>
+    <div style={{
+      display: 'flex',
+      minHeight: '100vh',
+      backgroundColor: '#f1f5f9',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      margin: 0,
+      padding: 0,
+      boxSizing: 'border-box'
+    }}>
       
-      {/* SIDEBAR - Desktop optimized */}
-      <aside style={{width:280,minWidth:280,background:'#1e293b',color:'#fff',display:'flex',flexDirection:'column',position:'fixed',height:'100vh',overflowY:'auto'}}>
-        <div style={{padding:24,borderBottom:'1px solid rgba(255,255,255,0.1)'}}>
-          <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-            <div style={{width:44,height:44,background:'linear-gradient(135deg,#0ea5e9,#2563eb)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:24}}>🏥</div>
+      {/* SIDEBAR */}
+      <aside style={{
+        width: '280px',
+        minWidth: '280px',
+        backgroundColor: '#1e293b',
+        color: '#ffffff',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'fixed',
+        height: '100vh',
+        left: 0,
+        top: 0,
+        overflowY: 'auto',
+        zIndex: 50,
+        boxShadow: '4px 0 10px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{padding: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+            <div style={{
+              width: '44px', 
+              height: '44px', 
+              background: 'linear-gradient(135deg,#0ea5e9,#2563eb)', 
+              borderRadius: '12px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '24px'
+            }}>🏥</div>
             <div>
-              <div style={{fontSize:18,fontWeight:800,letterSpacing:'-0.5px'}}>MediAdmin</div>
-              <div style={{fontSize:12,color:'#94a3b8'}}>Panel de Control</div>
+              <div style={{fontSize: '18px', fontWeight: 800, color: '#ffffff'}}>MediAdmin</div>
+              <div style={{fontSize: '12px', color: '#94a3b8'}}>Panel de Control</div>
             </div>
           </div>
         </div>
 
-        <nav style={{flex:1,padding:'20px 16px',display:'flex',flexDirection:'column',gap:8}}>
-          <div style={{fontSize:11,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'1px',padding:'0 12px',marginBottom:8}}>Principal</div>
+        <nav style={{flex: 1, padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '8px'}}>
+          <div style={{fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', padding: '0 12px', marginBottom: '8px'}}>Principal</div>
           
-          <button style={{...S.navBtn,background:'rgba(255,255,255,0.1)',color:'#fff'}}>
+          <button style={{
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '10px',
+            border: 'none',
+            backgroundColor: 'rgba(255,255,255,0.1)',
+            color: '#ffffff',
+            fontSize: '14px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left'
+          }}>
             <span>👨‍⚕️</span> Directorio Médico
           </button>
           
-          <button onClick={()=>navigate('/')} style={S.navBtn}>
+          <button onClick={()=>navigate('/')} style={{
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '10px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: '#94a3b8',
+            fontSize: '14px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left',
+            transition: 'all 0.2s'
+          }}>
             <span>🌐</span> Ver Sitio Público
           </button>
 
-          <div style={{fontSize:11,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'1px',padding:'20px 12px 8px'}}>Acciones Rápidas</div>
+          <div style={{fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', padding: '20px 12px 8px'}}>Acciones Rápidas</div>
           
-          <button onClick={openAdd} style={{...S.navBtn,background:'#0ea5e9',color:'#fff'}}>
+          <button onClick={openAdd} style={{
+            width: '100%',
+            padding: '12px 16px',
+            borderRadius: '10px',
+            border: 'none',
+            backgroundColor: '#0ea5e9',
+            color: '#ffffff',
+            fontSize: '14px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            textAlign: 'left',
+            boxShadow: '0 4px 6px -1px rgba(14,165,233,0.3)'
+          }}>
             <span>➕</span> Nuevo Médico
           </button>
         </nav>
 
-        <div style={{padding:16,borderTop:'1px solid rgba(255,255,255,0.1)'}}>
-          <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:12}}>
-            <div style={{width:36,height:36,borderRadius:'50%',background:'#334155',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>👤</div>
-            <div style={{flex:1}}>
-              <div style={{fontSize:13,fontWeight:600}}>Administrador</div>
-              <div style={{fontSize:11,color:'#94a3b8'}}>Admin</div>
+        <div style={{padding: '16px', borderTop: '1px solid rgba(255,255,255,0.1)'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px'}}>
+            <div style={{width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'}}>👤</div>
+            <div style={{flex: 1}}>
+              <div style={{fontSize: '13px', fontWeight: 600, color: '#ffffff'}}>Administrador</div>
+              <div style={{fontSize: '11px', color: '#94a3b8'}}>Admin</div>
             </div>
           </div>
-          <button onClick={logout} style={{width:'100%',padding:'10px',background:'rgba(239,68,68,0.2)',color:'#fca5a5',border:'1px solid rgba(239,68,68,0.3)',borderRadius:8,fontSize:13,fontWeight:600,cursor:'pointer'}}>
+          <button onClick={logout} style={{
+            width: '100%',
+            padding: '10px',
+            backgroundColor: 'rgba(239,68,68,0.2)',
+            color: '#fca5a5',
+            border: '1px solid rgba(239,68,68,0.3)',
+            borderRadius: '8px',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}>
             Cerrar Sesión
           </button>
         </div>
       </aside>
 
       {/* MAIN CONTENT */}
-      <main style={{flex:1,marginLeft:280,padding:32,minWidth:0}}>
+      <main style={{
+        flex: 1,
+        marginLeft: '280px',
+        padding: '32px',
+        minWidth: 0,
+        width: 'calc(100% - 280px)'
+      }}>
         
         {/* HEADER */}
-        <div style={{marginBottom:32}}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
-            <h1 style={{fontSize:32,fontWeight:800,color:'#0f172a',letterSpacing:'-0.5px'}}>Directorio Médico</h1>
-            <div style={{display:'flex',gap:12}}>
-              <div style={{background:'#fff',padding:'8px 16px',borderRadius:12,boxShadow:'0 1px 3px rgba(0,0,0,0.1)',fontSize:14,fontWeight:600,color:'#475569'}}>
+        <div style={{marginBottom: '32px'}}>
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px'}}>
+            <h1 style={{fontSize: '32px', fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.5px'}}>Directorio Médico</h1>
+            <div style={{display: 'flex', gap: '12px'}}>
+              <div style={{backgroundColor: '#ffffff', padding: '8px 16px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontSize: '14px', fontWeight: 600, color: '#475569'}}>
                 {rows.length} médicos registrados
               </div>
-              <div style={{background:'#fff',padding:'8px 16px',borderRadius:12,boxShadow:'0 1px 3px rgba(0,0,0,0.1)',fontSize:14,fontWeight:600,color:'#059669'}}>
+              <div style={{backgroundColor: '#ffffff', padding: '8px 16px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontSize: '14px', fontWeight: 600, color: '#059669'}}>
                 {rows.filter(r=>r.activo).length} activos
               </div>
             </div>
           </div>
-          <p style={{color:'#64748b',fontSize:16}}>Gestiona los médicos, consultorios y especialidades del directorio</p>
+          <p style={{color: '#64748b', fontSize: '16px', margin: 0}}>Gestiona los médicos, consultorios y especialidades del directorio</p>
         </div>
 
         {/* TOOLBAR */}
-        <div style={{background:'#fff',padding:20,borderRadius:16,boxShadow:'0 1px 3px rgba(0,0,0,0.1)',marginBottom:24,display:'flex',alignItems:'center',gap:16}}>
-          <div style={{flex:1,position:'relative',maxWidth:500}}>
-            <span style={{position:'absolute',left:16,top:'50%',transform:'translateY(-50%)',fontSize:18,color:'#94a3b8'}}>🔍</span>
+        <div style={{
+          backgroundColor: '#ffffff',
+          padding: '20px',
+          borderRadius: '16px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          marginBottom: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
+        }}>
+          <div style={{flex: 1, position: 'relative', maxWidth: '600px'}}>
+            <span style={{position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '18px', color: '#94a3b8'}}>🔍</span>
             <input 
               placeholder="Buscar por nombre, especialidad, consultorio..." 
               value={q} 
               onChange={e=>setQ(e.target.value)}
-              style={{width:'100%',padding:'12px 16px 12px 48px',border:'2px solid #e2e8f0',borderRadius:12,fontSize:15,outline:'none',transition:'all 0.2s'}}
+              style={{
+                width: '100%',
+                padding: '12px 16px 12px 48px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '12px',
+                fontSize: '15px',
+                outline: 'none',
+                backgroundColor: '#ffffff',
+                color: '#1e293b',
+                transition: 'all 0.2s',
+                boxSizing: 'border-box'
+              }}
             />
             {q && (
-              <button onClick={()=>setQ('')} style={{position:'absolute',right:16,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',color:'#94a3b8',cursor:'pointer',fontSize:18}}>✕</button>
+              <button onClick={()=>setQ('')} style={{
+                position: 'absolute',
+                right: '16px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                fontSize: '18px'
+              }}>✕</button>
             )}
           </div>
           
-          <button onClick={openAdd} style={{background:'#2563eb',color:'#fff',border:'none',padding:'12px 24px',borderRadius:12,fontSize:15,fontWeight:700,display:'flex',alignItems:'center',gap:8,cursor:'pointer',boxShadow:'0 4px 6px -1px rgba(37,99,235,0.3)',transition:'all 0.2s',whiteSpace:'nowrap'}}>
-            <span style={{fontSize:20}}>+</span> Agregar Médico
+          <button onClick={openAdd} style={{
+            backgroundColor: '#2563eb',
+            color: '#ffffff',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: '12px',
+            fontSize: '15px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 6px -1px rgba(37,99,235,0.3)',
+            transition: 'all 0.2s',
+            whiteSpace: 'nowrap',
+            flexShrink: 0
+          }}>
+            <span style={{fontSize: '20px'}}>+</span> Agregar Médico
           </button>
         </div>
 
         {/* STATS CARDS */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))',gap:16,marginBottom:24}}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: '16px',
+          marginBottom: '24px'
+        }}>
           {ESPECIALIDADES.slice(0,4).map((esp,idx)=>{
             const count = rows.filter(r=>r.especialidad===esp).length
             const colors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b']
             return (
-              <div key={esp} style={{background:'#fff',padding:20,borderRadius:16,boxShadow:'0 1px 3px rgba(0,0,0,0.1)',borderLeft:`4px solid ${colors[idx]}`}}>
-                <div style={{fontSize:12,color:'#64748b',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.5px'}}>{esp}</div>
-                <div style={{fontSize:28,fontWeight:800,color:'#0f172a',marginTop:4}}>{count}</div>
+              <div key={esp} style={{
+                backgroundColor: '#ffffff',
+                padding: '24px',
+                borderRadius: '16px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                borderLeft: `4px solid ${colors[idx]}`
+              }}>
+                <div style={{fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px'}}>{esp}</div>
+                <div style={{fontSize: '32px', fontWeight: 800, color: '#0f172a', marginTop: '8px'}}>{count}</div>
               </div>
             )
           })}
         </div>
 
-        {/* TABLE */}
-        <div style={{background:'#fff',borderRadius:16,boxShadow:'0 1px 3px rgba(0,0,0,0.1)',overflow:'hidden'}}>
+        {/* TABLE CONTAINER */}
+        <div style={{
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          overflow: 'hidden'
+        }}>
           {loading ? (
-            <div style={{padding:40}}>
-              <div style={{display:'flex',flexDirection:'column',gap:12}}>
-                {[...Array(6)].map((_,i)=><div key={i} style={{height:64,background:'#f1f5f9',borderRadius:8,animation:'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'}}/>)}
+            <div style={{padding: '40px'}}>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
+                {[...Array(6)].map((_,i)=><div key={i} style={{
+                  height: '64px', 
+                  backgroundColor: '#f1f5f9', 
+                  borderRadius: '8px',
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}/>)}
               </div>
             </div>
           ) : filtered.length===0 ? (
-            <div style={{padding:80,textAlign:'center'}}>
-              <div style={{fontSize:64,marginBottom:16}}>📋</div>
-              <h3 style={{fontSize:20,fontWeight:700,color:'#0f172a',marginBottom:8}}>{q?'No se encontraron resultados':'No hay médicos registrados'}</h3>
-              <p style={{color:'#64748b',marginBottom:24}}>{q?'Intenta con otra búsqueda':'Comienza agregando el primer médico al directorio'}</p>
-              {!q && <button onClick={openAdd} style={{background:'#2563eb',color:'#fff',border:'none',padding:'12px 24px',borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer'}}>+ Agregar Médico</button>}
+            <div style={{padding: '80px 20px', textAlign: 'center'}}>
+              <div style={{fontSize: '64px', marginBottom: '16px'}}>📋</div>
+              <h3 style={{fontSize: '20px', fontWeight: 700, color: '#0f172a', marginBottom: '8px'}}>{q?'No se encontraron resultados':'No hay médicos registrados'}</h3>
+              <p style={{color: '#64748b', marginBottom: '24px'}}>{q?'Intenta con otra búsqueda':'Comienza agregando el primer médico al directorio'}</p>
+              {!q && <button onClick={openAdd} style={{
+                backgroundColor: '#2563eb',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '12px',
+                fontSize: '15px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}>+ Agregar Médico</button>}
             </div>
           ) : (
-            <div style={{overflowX:'auto'}}>
-              <table style={{width:'100%',borderCollapse:'collapse',fontSize:14}}>
+            <div style={{overflowX: 'auto', width: '100%'}}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '14px',
+                minWidth: '1200px'
+              }}>
                 <thead>
-                  <tr style={{background:'#f8fafc',borderBottom:'2px solid #e2e8f0'}}>
-                    <th style={{padding:'16px 20px',textAlign:'left',fontSize:12,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.5px',whiteSpace:'nowrap'}}>Doctor</th>
-                    <th style={{padding:'16px 20px',textAlign:'left',fontSize:12,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.5px'}}>Especialidad</th>
-                    <th style={{padding:'16px 20px',textAlign:'left',fontSize:12,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.5px'}}>Ubicación</th>
-                    <th style={{padding:'16px 20px',textAlign:'left',fontSize:12,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.5px'}}>Contacto</th>
-                    <th style={{padding:'16px 20px',textAlign:'left',fontSize:12,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.5px'}}>Horario</th>
-                    <th style={{padding:'16px 20px',textAlign:'center',fontSize:12,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.5px'}}>Estado</th>
-                    <th style={{padding:'16px 20px',textAlign:'center',fontSize:12,fontWeight:700,color:'#64748b',textTransform:'uppercase',letterSpacing:'0.5px'}}>Acciones</th>
+                  <tr style={{backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0'}}>
+                    <th style={{padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', width: '25%'}}>Doctor</th>
+                    <th style={{padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', width: '15%'}}>Especialidad</th>
+                    <th style={{padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', width: '15%'}}>Ubicación</th>
+                    <th style={{padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', width: '20%'}}>Contacto</th>
+                    <th style={{padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', width: '15%'}}>Horario</th>
+                    <th style={{padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', width: '10%'}}>Estado</th>
+                    <th style={{padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', width: '10%'}}>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((r,idx)=>(
-                    <tr key={r.id} style={{borderBottom:'1px solid #f1f5f9',transition:'all 0.2s',background:idx%2===0?'#fff':'#fafafa','&:hover':{background:'#f0f9ff'}}}>
-                      <td style={{padding:'20px'}}>
-                        <div style={{display:'flex',alignItems:'center',gap:16}}>
-                          <div style={{width:48,height:48,borderRadius:12,background:'linear-gradient(135deg,#1e40af,#3b82f6)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,fontWeight:700,flexShrink:0}}>
+                    <tr key={r.id} style={{
+                      borderBottom: '1px solid #f1f5f9',
+                      backgroundColor: idx%2===0 ? '#ffffff' : '#fafafa',
+                      transition: 'background-color 0.15s'
+                    }}>
+                      <td style={{padding: '20px'}}>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
+                          <div style={{
+                            width: '48px', 
+                            height: '48px', 
+                            borderRadius: '12px', 
+                            background: 'linear-gradient(135deg,#1e40af,#3b82f6)', 
+                            color: '#ffffff', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            fontSize: '16px', 
+                            fontWeight: 700, 
+                            flexShrink: 0
+                          }}>
                             {initials(r.nombre_doctor)}
                           </div>
                           <div>
-                            <div style={{fontWeight:700,color:'#0f172a',fontSize:15,marginBottom:2}}>{r.nombre_doctor}</div>
-                            <div style={{fontSize:13,color:'#64748b'}}>{r.nombre_clinica}</div>
+                            <div style={{fontWeight: 700, color: '#0f172a', fontSize: '15px', marginBottom: '2px'}}>{r.nombre_doctor}</div>
+                            <div style={{fontSize: '13px', color: '#64748b'}}>{r.nombre_clinica}</div>
                           </div>
                         </div>
                       </td>
-                      <td style={{padding:'20px'}}>
-                        <span style={{background:'#dbeafe',color:'#1e40af',padding:'6px 14px',borderRadius:20,fontSize:12,fontWeight:700,display:'inline-block'}}>
+                      <td style={{padding: '20px'}}>
+                        <span style={{
+                          backgroundColor: '#dbeafe', 
+                          color: '#1e40af', 
+                          padding: '6px 14px', 
+                          borderRadius: '20px', 
+                          fontSize: '12px', 
+                          fontWeight: 700,
+                          display: 'inline-block'
+                        }}>
                           {r.especialidad}
                         </span>
                       </td>
-                      <td style={{padding:'20px'}}>
-                        <div style={{fontWeight:600,color:'#374151'}}>Consultorio {r.numero_consultorio}</div>
-                        <div style={{fontSize:13,color:'#6b7280'}}>{r.piso_nivel}</div>
+                      <td style={{padding: '20px'}}>
+                        <div style={{fontWeight: 600, color: '#374151'}}>Consultorio {r.numero_consultorio}</div>
+                        <div style={{fontSize: '13px', color: '#6b7280'}}>{r.piso_nivel}</div>
                       </td>
-                      <td style={{padding:'20px'}}>
-                        <div style={{display:'flex',flexDirection:'column',gap:4}}>
-                          {r.telefono && <div style={{fontSize:13,color:'#374151'}}>📞 {r.telefono}{r.extension && ` ext. ${r.extension}`}</div>}
-                          {r.whatsapp && <div style={{fontSize:13,color:'#059669'}}>💬 {r.whatsapp}</div>}
-                          {r.email && <div style={{fontSize:12,color:'#6b7280'}}>✉ {r.email}</div>}
+                      <td style={{padding: '20px'}}>
+                        <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+                          {r.telefono && <div style={{fontSize: '13px', color: '#374151'}}>📞 {r.telefono}{r.extension && ` ext. ${r.extension}`}</div>}
+                          {r.whatsapp && <div style={{fontSize: '13px', color: '#059669'}}>💬 {r.whatsapp}</div>}
+                          {r.email && <div style={{fontSize: '12px', color: '#6b7280'}}>✉ {r.email}</div>}
                         </div>
                       </td>
-                      <td style={{padding:'20px',maxWidth:200}}>
-                        <div style={{fontSize:13,color:'#374151',lineHeight:1.4}}>{r.horario_texto || '—'}</div>
+                      <td style={{padding: '20px'}}>
+                        <div style={{fontSize: '13px', color: '#374151', lineHeight: 1.4, maxWidth: '200px'}}>{r.horario_texto || '—'}</div>
                       </td>
-                      <td style={{padding:'20px',textAlign:'center'}}>
+                      <td style={{padding: '20px', textAlign: 'center'}}>
                         <button 
                           onClick={()=>toggleActivo(r)}
                           style={{
-                            background:r.activo?'#d1fae5':'#fee2e2',
-                            color:r.activo?'#065f46':'#991b1b',
-                            border:'none',
-                            padding:'8px 16px',
-                            borderRadius:20,
-                            fontSize:12,
-                            fontWeight:700,
-                            cursor:'pointer',
-                            display:'inline-flex',
-                            alignItems:'center',
-                            gap:6,
-                            transition:'all 0.2s'
+                            backgroundColor: r.activo ? '#d1fae5' : '#fee2e2',
+                            color: r.activo ? '#065f46' : '#991b1b',
+                            border: 'none',
+                            padding: '8px 16px',
+                            borderRadius: '20px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            transition: 'all 0.2s'
                           }}
                         >
-                          <span style={{width:6,height:6,borderRadius:'50%',background:r.activo?'#059669':'#dc2626'}}></span>
-                          {r.activo?'Activo':'Inactivo'}
+                          <span style={{
+                            width: '6px', 
+                            height: '6px', 
+                            borderRadius: '50%', 
+                            backgroundColor: r.activo ? '#059669' : '#dc2626'
+                          }}></span>
+                          {r.activo ? 'Activo' : 'Inactivo'}
                         </button>
                       </td>
-                      <td style={{padding:'20px',textAlign:'center'}}>
-                        <div style={{display:'flex',gap:8,justifyContent:'center'}}>
-                          <button onClick={()=>openEdit(r)} style={{background:'#eff6ff',color:'#2563eb',border:'none',padding:'8px 16px',borderRadius:8,fontSize:13,fontWeight:600,cursor:'pointer',transition:'all 0.2s'}}>✏ Editar</button>
-                          <button onClick={()=>setDelId(r.id)} style={{background:'#fef2f2',color:'#dc2626',border:'none',padding:'8px 12px',borderRadius:8,fontSize:13,fontWeight:600,cursor:'pointer',transition:'all 0.2s'}}>🗑</button>
+                      <td style={{padding: '20px', textAlign: 'center'}}>
+                        <div style={{display: 'flex', gap: '8px', justifyContent: 'center'}}>
+                          <button onClick={()=>openEdit(r)} style={{
+                            backgroundColor: '#eff6ff',
+                            color: '#2563eb',
+                            border: 'none',
+                            padding: '8px 16px',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}>✏ Editar</button>
+                          <button onClick={()=>setDelId(r.id)} style={{
+                            backgroundColor: '#fef2f2',
+                            color: '#dc2626',
+                            border: 'none',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}>🗑</button>
                         </div>
                       </td>
                     </tr>
@@ -283,20 +504,65 @@ export default function Admin(){
         </div>
       </main>
 
-      {/* MODAL - Desktop optimized with 3 columns */}
+      {/* MODAL */}
       {modal && (
-        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.6)',zIndex:100,display:'flex',alignItems:'center',justifyContent:'center',padding:40,backdropFilter:'blur(4px)'}} onClick={e=>e.target===e.currentTarget&&closeModal()}>
-          <div style={{background:'#fff',borderRadius:24,width:'100%',maxWidth:1000,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 25px 50px -12px rgba(0,0,0,0.25)'}}>
-            <div style={{padding:'24px 32px',borderBottom:'1px solid #e2e8f0',display:'flex',alignItems:'center',justifyContent:'space-between',position:'sticky',top:0,background:'#fff',zIndex:1}}>
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(15,23,42,0.6)',
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px',
+          backdropFilter: 'blur(4px)'
+        }} onClick={e=>e.target===e.currentTarget&&closeModal()}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            width: '100%',
+            maxWidth: '1000px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+          }}>
+            <div style={{
+              padding: '24px 32px',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              position: 'sticky',
+              top: 0,
+              backgroundColor: '#ffffff',
+              zIndex: 1
+            }}>
               <div>
-                <h2 style={{fontSize:24,fontWeight:800,color:'#0f172a'}}>{modal==='edit'?'✏ Editar médico':'+ Agregar nuevo médico'}</h2>
-                <p style={{color:'#64748b',fontSize:14,marginTop:4}}>Completa la información del profesional de la salud</p>
+                <h2 style={{fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0}}>{modal==='edit'?'✏ Editar médico':'+ Agregar nuevo médico'}</h2>
+                <p style={{color: '#64748b', fontSize: '14px', margin: '4px 0 0 0'}}>Completa la información del profesional de la salud</p>
               </div>
-              <button onClick={closeModal} style={{background:'#f1f5f9',border:'none',width:40,height:40,borderRadius:12,fontSize:20,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'#64748b',transition:'all 0.2s'}}>✕</button>
+              <button onClick={closeModal} style={{
+                backgroundColor: '#f1f5f9',
+                border: 'none',
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                fontSize: '20px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#64748b',
+                transition: 'all 0.2s'
+              }}>✕</button>
             </div>
             
-            <form onSubmit={save} style={{padding:32}}>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3, 1fr)',gap:20}}>
+            <form onSubmit={save} style={{padding: '32px'}}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                gap: '20px'
+              }}>
                 <Field label="Nombre del Doctor *" name="nombre_doctor" val={form.nombre_doctor} hc={hc} ph="Dr. Juan Pérez García" />
                 <Field label="Especialidad *" name="especialidad" val={form.especialidad} hc={hc} type="select" opts={ESPECIALIDADES} />
                 <Field label="Nombre de la Clínica" name="nombre_clinica" val={form.nombre_clinica} hc={hc} ph="Centro Médico del Valle" />
@@ -310,28 +576,72 @@ export default function Admin(){
                 <Field label="Email" name="email" val={form.email} hc={hc} type="email" ph="doctor@clinica.com" />
               </div>
               
-              <div style={{marginTop:20,display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
-                <Field label="Horario de Atención" name="horario_texto" val={form.horario_texto} hc={hc} ph="Lunes a Viernes: 8:00 AM - 2:00 PM y 4:00 PM - 8:00 PM" />
-                <Field label="URL Foto del Doctor" name="foto_url" val={form.foto_url} hc={hc} ph="https://ejemplo.com/foto.jpg" />
+              <div style={{marginTop: '20px'}}>
+                <Field label="Horario de Atención" name="horario_texto" val={form.horario_texto} hc={hc} ph="Lunes a Viernes: 8:00 AM - 2:00 PM" />
               </div>
               
-              <div style={{marginTop:20}}>
-                <Field label="Servicios (separados por coma)" name="servicios" val={form.servicios} hc={hc} ph="Consulta general, Ecocardiograma, Electrocardiograma, Holter, Prueba de esfuerzo" />
+              <div style={{marginTop: '20px'}}>
+                <Field label="Servicios (separados por coma)" name="servicios" val={form.servicios} hc={hc} ph="Consulta general, Ecocardiograma, Electrocardiograma" />
               </div>
 
-              <div style={{marginTop:24,padding:20,background:'#f8fafc',borderRadius:12,border:'1px solid #e2e8f0'}}>
-                <label style={{display:'flex',alignItems:'center',gap:12,cursor:'pointer'}}>
-                  <input type="checkbox" name="activo" checked={form.activo} onChange={hc} style={{width:20,height:20,accentColor:'#2563eb'}} />
+              <div style={{marginTop: '20px'}}>
+                <Field label="URL Foto del Doctor" name="foto_url" val={form.foto_url} hc={hc} ph="https://ejemplo.com/foto.jpg" />
+              </div>
+
+              <div style={{
+                marginTop: '24px',
+                padding: '20px',
+                backgroundColor: '#f8fafc',
+                borderRadius: '12px',
+                border: '1px solid #e2e8f0'
+              }}>
+                <label style={{display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer'}}>
+                  <input 
+                    type="checkbox" 
+                    name="activo" 
+                    checked={form.activo} 
+                    onChange={hc} 
+                    style={{width: '20px', height: '20px', accentColor: '#2563eb'}}
+                  />
                   <div>
-                    <div style={{fontSize:15,fontWeight:700,color:'#0f172a'}}>Consultorio activo</div>
-                    <div style={{fontSize:13,color:'#64748b'}}>El médico será visible en el directorio público</div>
+                    <div style={{fontSize: '15px', fontWeight: 700, color: '#0f172a'}}>Consultorio activo</div>
+                    <div style={{fontSize: '13px', color: '#64748b'}}>El médico será visible en el directorio público</div>
                   </div>
                 </label>
               </div>
 
-              <div style={{display:'flex',gap:12,justifyContent:'flex-end',marginTop:24,paddingTop:24,borderTop:'1px solid #e2e8f0'}}>
-                <button type="button" onClick={closeModal} style={{background:'#f1f5f9',color:'#475569',border:'none',padding:'12px 24px',borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer',transition:'all 0.2s'}}>Cancelar</button>
-                <button type="submit" disabled={saving} style={{background:'#2563eb',color:'#fff',border:'none',padding:'12px 32px',borderRadius:12,fontSize:15,fontWeight:700,cursor:saving?'not-allowed':'pointer',opacity:saving?0.6:1,boxShadow:'0 4px 6px -1px rgba(37,99,235,0.3)',transition:'all 0.2s'}}>
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end',
+                marginTop: '24px',
+                paddingTop: '24px',
+                borderTop: '1px solid #e2e8f0'
+              }}>
+                <button type="button" onClick={closeModal} style={{
+                  backgroundColor: '#f1f5f9',
+                  color: '#475569',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '12px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}>Cancelar</button>
+                <button type="submit" disabled={saving} style={{
+                  backgroundColor: '#2563eb',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '12px 32px',
+                  borderRadius: '12px',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.6 : 1,
+                  boxShadow: '0 4px 6px -1px rgba(37,99,235,0.3)',
+                  transition: 'all 0.2s'
+                }}>
                   {saving?'⏳ Guardando...':'💾 Guardar Registro'}
                 </button>
               </div>
@@ -342,14 +652,61 @@ export default function Admin(){
 
       {/* CONFIRM DELETE */}
       {delId && (
-        <div style={{position:'fixed',inset:0,background:'rgba(15,23,42,0.6)',zIndex:100,display:'flex',alignItems:'center',justifyContent:'center',padding:40,backdropFilter:'blur(4px)'}}>
-          <div style={{background:'#fff',borderRadius:24,padding:48,textAlign:'center',maxWidth:420,width:'100%',boxShadow:'0 25px 50px -12px rgba(0,0,0,0.25)'}}>
-            <div style={{width:80,height:80,borderRadius:'50%',background:'#fef2f2',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 24px',fontSize:40}}>⚠️</div>
-            <h3 style={{fontSize:22,fontWeight:800,color:'#0f172a',marginBottom:12}}>¿Eliminar registro?</h3>
-            <p style={{color:'#64748b',fontSize:16,lineHeight:1.5,marginBottom:32}}>Esta acción eliminará permanentemente al médico del directorio. No se puede deshacer.</p>
-            <div style={{display:'flex',gap:12,justifyContent:'center'}}>
-              <button onClick={()=>setDelId(null)} style={{background:'#f1f5f9',color:'#475569',border:'none',padding:'12px 24px',borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer'}}>Cancelar</button>
-              <button onClick={()=>del(delId)} style={{background:'#dc2626',color:'#fff',border:'none',padding:'12px 24px',borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 6px -1px rgba(220,38,38,0.3)'}}>Sí, eliminar</button>
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(15,23,42,0.6)',
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '40px',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '24px',
+            padding: '48px',
+            textAlign: 'center',
+            maxWidth: '420px',
+            width: '100%',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
+          }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              backgroundColor: '#fef2f2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 24px',
+              fontSize: '40px'
+            }}>⚠️</div>
+            <h3 style={{fontSize: '22px', fontWeight: 800, color: '#0f172a', marginBottom: '12px'}}>¿Eliminar registro?</h3>
+            <p style={{color: '#64748b', fontSize: '16px', lineHeight: 1.5, marginBottom: '32px'}}>Esta acción eliminará permanentemente al médico del directorio. No se puede deshacer.</p>
+            <div style={{display: 'flex', gap: '12px', justifyContent: 'center'}}>
+              <button onClick={()=>setDelId(null)} style={{
+                backgroundColor: '#f1f5f9',
+                color: '#475569',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '12px',
+                fontSize: '15px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}>Cancelar</button>
+              <button onClick={()=>del(delId)} style={{
+                backgroundColor: '#dc2626',
+                color: '#ffffff',
+                border: 'none',
+                padding: '12px 24px',
+                borderRadius: '12px',
+                fontSize: '15px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 6px -1px rgba(220,38,38,0.3)'
+              }}>Sí, eliminar</button>
             </div>
           </div>
         </div>
@@ -357,8 +714,24 @@ export default function Admin(){
 
       {/* TOAST */}
       {toast && (
-        <div style={{position:'fixed',bottom:32,right:32,padding:'16px 24px',borderRadius:12,fontSize:15,fontWeight:600,boxShadow:'0 10px 15px -3px rgba(0,0,0,0.1)',zIndex:200,background:toast.type==='err'?'#fef2f2':'#f0fdf4',color:toast.type==='err'?'#991b1b':'#166534',border:`1px solid ${toast.type==='err'?'#fecaca':'#bbf7d0'}`,display:'flex',alignItems:'center',gap:8}}>
-          <span style={{fontSize:20}}>{toast.type==='err'?'❌':'✅'}</span>
+        <div style={{
+          position: 'fixed',
+          bottom: '32px',
+          right: '32px',
+          padding: '16px 24px',
+          borderRadius: '12px',
+          fontSize: '15px',
+          fontWeight: 600,
+          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+          zIndex: 200,
+          backgroundColor: toast.type==='err' ? '#fef2f2' : '#f0fdf4',
+          color: toast.type==='err' ? '#991b1b' : '#166534',
+          border: `1px solid ${toast.type==='err' ? '#fecaca' : '#bbf7d0'}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <span style={{fontSize: '20px'}}>{toast.type==='err'?'❌':'✅'}</span>
           {toast.msg}
         </div>
       )}
@@ -367,11 +740,24 @@ export default function Admin(){
 }
 
 function Field({label,name,val,hc,ph,type='text',opts}){
+  const inputStyle = {
+    width: '100%',
+    padding: '12px 16px',
+    border: '2px solid #e5e7eb',
+    borderRadius: '10px',
+    fontSize: '15px',
+    outline: 'none',
+    backgroundColor: '#ffffff',
+    color: '#111827',
+    transition: 'all 0.2s',
+    boxSizing: 'border-box'
+  }
+
   return (
-    <div style={{display:'flex',flexDirection:'column',gap:6}}>
-      <label style={{fontSize:12,fontWeight:700,color:'#374151',textTransform:'uppercase',letterSpacing:'0.5px'}}>{label}</label>
+    <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
+      <label style={{fontSize: '12px', fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.5px'}}>{label}</label>
       {type==='select'
-        ? <select name={name} value={val} onChange={hc} style={{padding:'12px 16px',border:'2px solid #e5e7eb',borderRadius:10,fontSize:15,outline:'none',transition:'all 0.2s',background:'#fff',color:'#111827',cursor:'pointer'}}>
+        ? <select name={name} value={val} onChange={hc} style={{...inputStyle, cursor: 'pointer'}}>
             <option value="">Seleccionar...</option>
             {opts.map(o=><option key={o} value={o}>{o}</option>)}
           </select>
@@ -381,28 +767,9 @@ function Field({label,name,val,hc,ph,type='text',opts}){
             value={val} 
             onChange={hc} 
             placeholder={ph} 
-            style={{padding:'12px 16px',border:'2px solid #e5e7eb',borderRadius:10,fontSize:15,outline:'none',transition:'all 0.2s',background:'#fff',color:'#111827',width:'100%'}} 
+            style={inputStyle}
           />
       }
     </div>
   )
-}
-
-const S = {
-  navBtn: { 
-    width:'100%', 
-    padding:'12px 16px', 
-    borderRadius:10, 
-    border:'none', 
-    background:'transparent', 
-    color:'#94a3b8', 
-    fontSize:14, 
-    fontWeight:600, 
-    cursor:'pointer',
-    display:'flex',
-    alignItems:'center',
-    gap:12,
-    transition:'all 0.2s',
-    textAlign:'left'
-  }
 }
