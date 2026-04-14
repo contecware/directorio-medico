@@ -11,7 +11,7 @@ const ESP_EMOJI = {
   'Odontología':'🦷','Medicina General':'🩺','Oncología':'🎗️','Reumatología':'💊',
 }
 const ESPECIALIDADES = Object.keys(ESP_EMOJI)
-const NIVELES = ['Nivel 1','Nivel 2','Nivel 3','Nivel 4','Nivel 5','Piso 1','Piso 2','Piso 3']
+const NIVELES = ['Nivel 1','Nivel 2','Nivel 3','Nivel 4','Nivel 5','Nivel 6','Nivel 7','Nivel 8','Nivel 9']
 
 function initials(name = '') {
   return name.split(' ').filter(w => /^[A-ZÁÉÍÓÚ]/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('')
