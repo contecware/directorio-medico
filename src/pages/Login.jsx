@@ -9,7 +9,7 @@ export default function Login(){
   const [busy,setBusy] = useState(false)
 
   const ADMIN_USER = import.meta.env.VITE_ADMIN_USER || 'admin'
-  const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || 'admin123'
+  const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || 'Sist3m@7487'
 
   function handleLogin(e){
     e.preventDefault()
