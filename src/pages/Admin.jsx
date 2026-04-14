@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
-import './Admin.css'  // Asegúrate de que esta ruta sea correcta
+import './Admin.module.css'  
 
 const ESPECIALIDADES = [
   'Cardiología','Pediatría','Ortopedia','Dermatología','Neurología',
