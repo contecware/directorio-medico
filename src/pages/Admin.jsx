@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabase'
-import './Admin.module.css'  
+import styles from './Admin.module.css'  
 
 const ESPECIALIDADES = [
   'Cardiología','Pediatría','Ortopedia','Dermatología','Neurología',
@@ -85,115 +85,115 @@ export default function Admin(){
   const filtered = rows.filter(r=>!q||[r.nombre_doctor,r.especialidad,r.nombre_clinica,r.numero_consultorio].some(v=>v?.toLowerCase().includes(q.toLowerCase())))
 
   return (
-    <div className="page">
-      <div className="admin-container">
+    <div className={styles.page}>
+      <div className={styles.adminContainer}>
         
         {/* SIDEBAR */}
-        <aside className="sidebar">
-          <div className="sidebar-header">
-            <div className="sidebar-icon">🏥</div>
-            <div className="sidebar-brand">
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarHeader}>
+            <div className={styles.sidebarIcon}>🏥</div>
+            <div className={styles.sidebarBrand}>
               <h1>MediAdmin</h1>
               <span>Panel de Control</span>
             </div>
           </div>
 
-          <nav className="sidebar-nav">
-            <div className="nav-section">Principal</div>
+          <nav className={styles.sidebarNav}>
+            <div className={styles.navSection}>Principal</div>
             
-            <button className="nav-btn active">
+            <button className={`${styles.navBtn} ${styles.active}`}>
               <span>👨‍⚕️</span> Directorio Médico
             </button>
             
-            <button className="nav-btn" onClick={()=>navigate('/')}>
+            <button className={styles.navBtn} onClick={()=>navigate('/')}>
               <span>🌐</span> Ver Sitio Público
             </button>
 
-            <div className="nav-section">Acciones Rápidas</div>
+            <div className={styles.navSection}>Acciones Rápidas</div>
             
-            <button className="nav-btn primary" onClick={openAdd}>
+            <button className={`${styles.navBtn} ${styles.primary}`} onClick={openAdd}>
               <span>➕</span> Nuevo Médico
             </button>
           </nav>
 
-          <div className="sidebar-footer">
-            <div className="user-info">
-              <div className="user-avatar">👤</div>
-              <div className="user-details">
+          <div className={styles.sidebarFooter}>
+            <div className={styles.userInfo}>
+              <div className={styles.userAvatar}>👤</div>
+              <div className={styles.userDetails}>
                 <h4>Administrador</h4>
                 <span>Admin</span>
               </div>
             </div>
-            <button className="logout-btn" onClick={logout}>
+            <button className={styles.logoutBtn} onClick={logout}>
               Cerrar Sesión
             </button>
           </div>
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="main-content">
+        <main className={styles.mainContent}>
           
           {/* HEADER */}
-          <div className="content-header">
+          <div className={styles.contentHeader}>
             <div>
-              <h1>Directorio Médico</h1>
-              <p className="subtitle">Gestiona los médicos, consultorios y especialidades del directorio</p>
+              <h1 className={styles.title}>Directorio Médico</h1>
+              <p className={styles.subtitle}>Gestiona los médicos, consultorios y especialidades del directorio</p>
             </div>
-            <div className="header-stats">
-              <div className="stat-pill">{rows.length} médicos registrados</div>
-              <div className="stat-pill active">{rows.filter(r=>r.activo).length} activos</div>
+            <div className={styles.headerStats}>
+              <div className={styles.statPill}>{rows.length} médicos registrados</div>
+              <div className={`${styles.statPill} ${styles.active}`}>{rows.filter(r=>r.activo).length} activos</div>
             </div>
           </div>
 
           {/* TOOLBAR */}
-          <div className="toolbar">
-            <div className="search-container">
-              <span className="search-icon">🔍</span>
+          <div className={styles.toolbar}>
+            <div className={styles.searchContainer}>
+              <span className={styles.searchIcon}>🔍</span>
               <input 
-                className="search-input"
+                className={styles.searchInput}
                 placeholder="Buscar por nombre, especialidad, consultorio..." 
                 value={q} 
                 onChange={e=>setQ(e.target.value)}
               />
               {q && (
-                <button className="search-clear" onClick={()=>setQ('')}>✕</button>
+                <button className={styles.searchClear} onClick={()=>setQ('')}>✕</button>
               )}
             </div>
             
-            <button className="add-btn" onClick={openAdd}>
+            <button className={styles.addBtn} onClick={openAdd}>
               <span>+</span> Agregar Médico
             </button>
           </div>
 
           {/* STATS CARDS */}
-          <div className="stats-grid">
+          <div className={styles.statsGrid}>
             {ESPECIALIDADES.slice(0,4).map((esp,idx)=>{
               const count = rows.filter(r=>r.especialidad===esp).length
               return (
-                <div key={esp} className="stat-card">
-                  <div className="stat-label">{esp}</div>
-                  <div className="stat-value">{count}</div>
+                <div key={esp} className={styles.statCard}>
+                  <div className={styles.statLabel}>{esp}</div>
+                  <div className={styles.statValue}>{count}</div>
                 </div>
               )
             })}
           </div>
 
           {/* TABLE */}
-          <div className="table-container">
+          <div className={styles.tableContainer}>
             {loading ? (
               <div style={{padding: '40px'}}>
-                {[...Array(6)].map((_,i)=><div key={i} className="skeleton"/>)}
+                {[...Array(6)].map((_,i)=><div key={i} className={styles.skeleton}/>)}
               </div>
             ) : filtered.length===0 ? (
-              <div className="empty-state">
-                <div className="empty-icon">📋</div>
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>📋</div>
                 <h3>{q?'No se encontraron resultados':'No hay médicos registrados'}</h3>
                 <p>{q?'Intenta con otra búsqueda':'Comienza agregando el primer médico al directorio'}</p>
-                {!q && <button className="add-btn" onClick={openAdd}>+ Agregar Médico</button>}
+                {!q && <button className={styles.addBtn} onClick={openAdd}>+ Agregar Médico</button>}
               </div>
             ) : (
-              <div className="table-scroll">
-                <table className="table">
+              <div className={styles.tableScroll}>
+                <table className={styles.table}>
                   <thead>
                     <tr>
                       <th>Doctor</th>
@@ -201,54 +201,54 @@ export default function Admin(){
                       <th>Ubicación</th>
                       <th>Contacto</th>
                       <th>Horario</th>
-                      <th className="text-center">Estado</th>
-                      <th className="text-center">Acciones</th>
+                      <th className={styles.textCenter}>Estado</th>
+                      <th className={styles.textCenter}>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((r,idx)=>(
                       <tr key={r.id}>
                         <td>
-                          <div className="doctor-cell">
-                            <div className="doctor-avatar">{initials(r.nombre_doctor)}</div>
-                            <div className="doctor-info">
+                          <div className={styles.doctorCell}>
+                            <div className={styles.doctorAvatar}>{initials(r.nombre_doctor)}</div>
+                            <div className={styles.doctorInfo}>
                               <h4>{r.nombre_doctor}</h4>
                               <span>{r.nombre_clinica}</span>
                             </div>
                           </div>
                         </td>
                         <td>
-                          <span className="esp-tag">{r.especialidad}</span>
+                          <span className={styles.espTag}>{r.especialidad}</span>
                         </td>
                         <td>
-                          <div className="location-cell">
+                          <div className={styles.locationCell}>
                             Consultorio {r.numero_consultorio}
                             <span>{r.piso_nivel}</span>
                           </div>
                         </td>
                         <td>
-                          <div className="contact-cell">
+                          <div className={styles.contactCell}>
                             {r.telefono && <div>📞 {r.telefono}{r.extension && ` ext. ${r.extension}`}</div>}
-                            {r.whatsapp && <div className="whatsapp">💬 {r.whatsapp}</div>}
-                            {r.email && <div className="email">✉ {r.email}</div>}
+                            {r.whatsapp && <div className={styles.whatsapp}>💬 {r.whatsapp}</div>}
+                            {r.email && <div className={styles.email}>✉ {r.email}</div>}
                           </div>
                         </td>
                         <td>
-                          <div className="schedule-cell">{r.horario_texto || '—'}</div>
+                          <div className={styles.scheduleCell}>{r.horario_texto || '—'}</div>
                         </td>
-                        <td className="text-center">
+                        <td className={styles.textCenter}>
                           <button 
                             onClick={()=>toggleActivo(r)}
-                            className={`status-pill ${r.activo?'active':'inactive'}`}
+                            className={`${styles.statusPill} ${r.activo ? styles.active : styles.inactive}`}
                           >
-                            <span className="status-dot"></span>
+                            <span className={styles.statusDot}></span>
                             {r.activo?'Activo':'Inactivo'}
                           </button>
                         </td>
                         <td>
-                          <div className="action-btns">
-                            <button className="edit-btn" onClick={()=>openEdit(r)}>✏ Editar</button>
-                            <button className="del-btn" onClick={()=>setDelId(r.id)}>🗑</button>
+                          <div className={styles.actionBtns}>
+                            <button className={styles.editBtn} onClick={()=>openEdit(r)}>✏ Editar</button>
+                            <button className={styles.delBtn} onClick={()=>setDelId(r.id)}>🗑</button>
                           </div>
                         </td>
                       </tr>
@@ -262,18 +262,18 @@ export default function Admin(){
 
         {/* MODAL */}
         {modal && (
-          <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&closeModal()}>
-            <div className="modal">
-              <div className="modal-header">
-                <div className="modal-title">
+          <div className={styles.modalOverlay} onClick={e=>e.target===e.currentTarget&&closeModal()}>
+            <div className={styles.modal}>
+              <div className={styles.modalHeader}>
+                <div className={styles.modalTitle}>
                   <h2>{modal==='edit'?'✏ Editar médico':'+ Agregar nuevo médico'}</h2>
                   <p>Completa la información del profesional de la salud</p>
                 </div>
-                <button className="modal-close" onClick={closeModal}>✕</button>
+                <button className={styles.modalClose} onClick={closeModal}>✕</button>
               </div>
               
-              <form onSubmit={save} className="modal-body">
-                <div className="form-grid">
+              <form onSubmit={save} className={styles.modalBody}>
+                <div className={styles.formGrid}>
                   <FormField label="Nombre del Doctor *" name="nombre_doctor" val={form.nombre_doctor} hc={hc} ph="Dr. Juan Pérez García" />
                   <FormField label="Especialidad *" name="especialidad" val={form.especialidad} hc={hc} type="select" opts={ESPECIALIDADES} />
                   <FormField label="Nombre de la Clínica" name="nombre_clinica" val={form.nombre_clinica} hc={hc} ph="Centro Médico del Valle" />
@@ -287,10 +287,10 @@ export default function Admin(){
                   <FormField label="Email" name="email" val={form.email} hc={hc} type="email" ph="doctor@clinica.com" />
                 </div>
                 
-                <div className="form-field full-width" style={{marginTop: '20px'}}>
-                  <label className="field-label">Horario de Atención</label>
+                <div className={`${styles.formField} ${styles.fullWidth}`} style={{marginTop: '20px'}}>
+                  <label className={styles.fieldLabel}>Horario de Atención</label>
                   <input 
-                    className="field-input"
+                    className={styles.fieldInput}
                     name="horario_texto" 
                     value={form.horario_texto} 
                     onChange={hc} 
@@ -298,10 +298,10 @@ export default function Admin(){
                   />
                 </div>
                 
-                <div className="form-field full-width" style={{marginTop: '20px'}}>
-                  <label className="field-label">Servicios (separados por coma)</label>
+                <div className={`${styles.formField} ${styles.fullWidth}`} style={{marginTop: '20px'}}>
+                  <label className={styles.fieldLabel}>Servicios (separados por coma)</label>
                   <input 
-                    className="field-input"
+                    className={styles.fieldInput}
                     name="servicios" 
                     value={form.servicios} 
                     onChange={hc} 
@@ -309,10 +309,10 @@ export default function Admin(){
                   />
                 </div>
 
-                <div className="form-field full-width" style={{marginTop: '20px'}}>
-                  <label className="field-label">URL Foto del Doctor</label>
+                <div className={`${styles.formField} ${styles.fullWidth}`} style={{marginTop: '20px'}}>
+                  <label className={styles.fieldLabel}>URL Foto del Doctor</label>
                   <input 
-                    className="field-input"
+                    className={styles.fieldInput}
                     name="foto_url" 
                     value={form.foto_url} 
                     onChange={hc} 
@@ -320,24 +320,24 @@ export default function Admin(){
                   />
                 </div>
 
-                <div className="checkbox-container">
-                  <label className="checkbox-field">
+                <div className={styles.checkboxContainer}>
+                  <label className={styles.checkboxField}>
                     <input 
                       type="checkbox" 
                       name="activo" 
                       checked={form.activo} 
                       onChange={hc}
                     />
-                    <div className="checkbox-label">
+                    <div className={styles.checkboxLabel}>
                       <strong>Consultorio activo</strong>
                       <span>El médico será visible en el directorio público</span>
                     </div>
                   </label>
                 </div>
 
-                <div className="modal-footer">
-                  <button type="button" className="btn-cancel" onClick={closeModal}>Cancelar</button>
-                  <button type="submit" className="btn-save" disabled={saving}>
+                <div className={styles.modalFooter}>
+                  <button type="button" className={styles.btnCancel} onClick={closeModal}>Cancelar</button>
+                  <button type="submit" className={styles.btnSave} disabled={saving}>
                     {saving?'⏳ Guardando...':'💾 Guardar Registro'}
                   </button>
                 </div>
@@ -348,14 +348,14 @@ export default function Admin(){
 
         {/* CONFIRM DELETE */}
         {delId && (
-          <div className="modal-overlay">
-            <div className="confirm-box">
-              <div className="confirm-icon">⚠️</div>
+          <div className={styles.modalOverlay}>
+            <div className={styles.confirmBox}>
+              <div className={styles.confirmIcon}>⚠️</div>
               <h3>¿Eliminar registro?</h3>
               <p>Esta acción eliminará permanentemente al médico del directorio. No se puede deshacer.</p>
-              <div className="confirm-actions">
-                <button className="btn-cancel" onClick={()=>setDelId(null)}>Cancelar</button>
-                <button className="btn-delete" onClick={()=>del(delId)}>Sí, eliminar</button>
+              <div className={styles.confirmActions}>
+                <button className={styles.btnCancel} onClick={()=>setDelId(null)}>Cancelar</button>
+                <button className={styles.btnDelete} onClick={()=>del(delId)}>Sí, eliminar</button>
               </div>
             </div>
           </div>
@@ -363,7 +363,7 @@ export default function Admin(){
 
         {/* TOAST */}
         {toast && (
-          <div className={`toast ${toast.type==='err'?'error':'success'}`}>
+          <div className={`${styles.toast} ${toast.type==='err' ? styles.error : styles.success}`}>
             <span>{toast.type==='err'?'❌':'✅'}</span>
             {toast.msg}
           </div>
@@ -374,21 +374,58 @@ export default function Admin(){
 }
 
 function FormField({label,name,val,hc,ph,type='text',opts}){
+  const styles = {
+    formField: 'formField',
+    fieldLabel: 'fieldLabel',
+    fieldInput: 'fieldInput',
+    fieldSelect: 'fieldSelect'
+  }
+  
+  // Obtener estilos del módulo padre mediante una pequeña trampa
+  // o pasarlos como prop. Por simplicidad, usaré estilos inline aquí
+  // o podemos definirlo dentro del componente principal
+  
   return (
-    <div className="form-field">
-      <label className="field-label">{label}</label>
+    <div className="formField" style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
+      <label style={{fontSize: '12px', fontWeight: 700, color: '#374151', textTransform: 'uppercase', letterSpacing: '0.5px'}}>
+        {label}
+      </label>
       {type==='select'
-        ? <select className="field-select" name={name} value={val} onChange={hc}>
+        ? <select 
+            name={name} 
+            value={val} 
+            onChange={hc}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '2px solid #e5e7eb',
+              borderRadius: '10px',
+              fontSize: '15px',
+              outline: 'none',
+              background: '#ffffff',
+              color: '#111827',
+              cursor: 'pointer'
+            }}
+          >
             <option value="">Seleccionar...</option>
             {opts.map(o=><option key={o} value={o}>{o}</option>)}
           </select>
         : <input 
-            className="field-input"
             name={name} 
             type={type} 
             value={val} 
             onChange={hc} 
             placeholder={ph}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '2px solid #e5e7eb',
+              borderRadius: '10px',
+              fontSize: '15px',
+              outline: 'none',
+              background: '#ffffff',
+              color: '#111827'
+            }}
           />
       }
     </div>
