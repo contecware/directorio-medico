@@ -144,7 +144,7 @@ export default function Directorio() {
           <div style={S.navIcon}>🏥</div>
           <div>
             <div style={{color:'#fff',fontSize:16,fontWeight:700,lineHeight:1.1}}>Directorio Médico</div>
-            <div style={{color:'rgba(255,255,255,0.7)',fontSize:10}}>Torre Médica · Encuentra tu especialista</div>
+            <div style={{color:'rgba(255,255,255,0.7)',fontSize:10}}>Clínicas Centro Médico Torre II · Encuentra tu especialista</div>
           </div>
         </div>
         <button style={S.navBtn} onClick={() => navigate('/login')}>⚙ Admin</button>
@@ -154,7 +154,7 @@ export default function Directorio() {
       <header style={S.hero}>
         <div style={S.heroBadge}>🔴 Actualizado en tiempo real</div>
         <h1 style={S.heroTitle}>Directorio Médico</h1>
-        <p style={{color:'rgba(255,255,255,0.7)',fontSize:14,marginBottom:22}}>Torre Médica · Encuentra tu especialista</p>
+        <p style={{color:'rgba(255,255,255,0.7)',fontSize:14,marginBottom:22}}>Clinicas Centro Medico Torre II  · Encuentra tu especialista</p>
 
         {/* Search card flotante */}
         <div style={S.searchCard}>
